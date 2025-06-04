@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/dro14/yordamchi-api/models"
 	"github.com/dro14/yordamchi-api/utils/e"
@@ -58,12 +59,14 @@ func (h *Handler) chat(c *gin.Context) {
 	c.Writer.Flush()
 
 	stream := h.provider.ContentStream(request)
+	builder := &strings.Builder{}
 	for chunk, err := range stream {
 		if err != nil {
 			sendSSEEvent(c, "error", err.Error())
 		} else {
 			part := chunk.Candidates[0].Content.Parts[0]
-			sendSSEEvent(c, "chunk", part.Text)
+			builder.WriteString(part.Text)
+			sendSSEEvent(c, "response", builder.String())
 		}
 	}
 }
