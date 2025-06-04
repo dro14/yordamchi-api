@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/dro14/yordamchi-api/models"
-	"github.com/dro14/yordamchi-api/utils/e"
 	"github.com/dro14/yordamchi-api/utils/info"
 	"github.com/gin-gonic/gin"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -48,23 +47,22 @@ func (h *Handler) chat(c *gin.Context) {
 	request := &models.Request{}
 	err := c.ShouldBindJSON(request)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, failure(err))
+		sendSSEEvent(c, "error", err.Error())
 		return
 	}
 
 	if len(request.Contents) == 0 {
-		c.JSON(http.StatusBadRequest, failure(e.ErrContentsRequired))
+		sendSSEEvent(c, "error", "contents are required")
 		return
 	}
 
 	stream := h.provider.ContentStream(request)
 	for chunk, err := range stream {
 		if err != nil {
-			c.SSEvent("error", err.Error())
+			sendSSEEvent(c, "error", err.Error())
 		} else {
 			part := chunk.Candidates[0].Content.Parts[0]
-			c.SSEvent("chunk", part.Text)
+			sendSSEEvent(c, "chunk", part.Text)
 		}
-		c.Writer.Flush()
 	}
 }
