@@ -79,6 +79,7 @@ func (h *Handler) createMessage(c *gin.Context) {
 		}
 	}
 
+	response.Id = time.Now().UnixMilli()
 	if len(response.Text) > 0 {
 		sendSSEEvent(c, "response", jsonEncode(response))
 	}
