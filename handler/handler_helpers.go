@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -23,4 +24,12 @@ func notifyOnPanic(c *gin.Context, err any) {
 	info.SendDocument("my.log")
 	info.SendDocument("gin.log")
 	c.AbortWithStatus(http.StatusInternalServerError)
+}
+
+func jsonEncode(data any) string {
+	json, err := json.Marshal(data)
+	if err != nil {
+		return ""
+	}
+	return string(json)
 }

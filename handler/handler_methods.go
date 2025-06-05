@@ -3,7 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
-	"strings"
+	"time"
 
 	"github.com/dro14/yordamchi-api/models"
 	"github.com/dro14/yordamchi-api/utils/e"
@@ -17,7 +17,7 @@ func (h *Handler) Run(port string) error {
 
 	h.engine.GET("", h.root)
 	h.engine.POST("/info", h.info)
-	h.engine.POST("/chat", h.chat)
+	h.engine.POST("/message", h.createMessage)
 
 	return h.engine.Run(":" + port)
 }
@@ -38,7 +38,7 @@ func (h *Handler) info(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true})
 }
 
-func (h *Handler) chat(c *gin.Context) {
+func (h *Handler) createMessage(c *gin.Context) {
 	request := &models.Request{}
 	err := c.ShouldBindJSON(request)
 	if err != nil {
@@ -58,15 +58,28 @@ func (h *Handler) chat(c *gin.Context) {
 	c.Writer.Header().Set("X-Accel-Buffering", "no")
 	c.Writer.Flush()
 
+	response := &models.Message{
+		UserId:    request.UserId,
+		ChatId:    request.ChatId,
+		Role:      "model",
+		CreatedAt: time.Now().UnixMilli(),
+		InReplyTo: request.Contents[len(request.Contents)-1].Id,
+	}
+
 	stream := h.provider.ContentStream(request)
-	builder := &strings.Builder{}
 	for chunk, err := range stream {
 		if err != nil {
 			sendSSEEvent(c, "error", err.Error())
 		} else {
+			if len(response.Text) > 0 {
+				sendSSEEvent(c, "response", jsonEncode(response))
+			}
 			part := chunk.Candidates[0].Content.Parts[0]
-			builder.WriteString(part.Text)
-			sendSSEEvent(c, "response", builder.String())
+			response.Text += part.Text
 		}
+	}
+
+	if len(response.Text) > 0 {
+		sendSSEEvent(c, "response", jsonEncode(response))
 	}
 }

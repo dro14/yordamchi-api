@@ -4,9 +4,9 @@ type Request struct {
 	Id                int        `json:"id"`
 	UserId            int        `json:"user_id"`
 	ChatId            int        `json:"chat_id"`
-	StartedAt         int        `json:"started_at"`
-	FinishedAt        int        `json:"finished_at"`
-	Latency           int        `json:"latency"`
+	StartedAt         int64      `json:"started_at"`
+	FinishedAt        int64      `json:"finished_at"`
+	Latency           int64      `json:"latency"`
 	Chunks            int        `json:"chunks"`
 	Attempts          int        `json:"attempts"`
 	Language          string     `json:"language"`
