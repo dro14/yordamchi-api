@@ -63,17 +63,18 @@ func (h *Handler) createMessage(c *gin.Context) {
 	message.Id = time.Now().UnixMilli()
 	sendSSEEvent(c, "request", jsonEncode(message))
 
-	buidler := &strings.Builder{}
+	builder := &strings.Builder{}
 	stream := h.provider.ContentStream(request)
 	for chunk, err := range stream {
 		if err != nil {
 			sendSSEEvent(c, "error", err.Error())
 		} else {
-			if buidler.Len() > 0 {
-				sendSSEEvent(c, "typing", buidler.String())
+			if builder.Len() > 0 {
+				typing := map[string]string{"text": builder.String()}
+				sendSSEEvent(c, "typing", jsonEncode(typing))
 			}
 			part := chunk.Candidates[0].Content.Parts[0]
-			buidler.WriteString(part.Text)
+			builder.WriteString(part.Text)
 		}
 	}
 
@@ -84,6 +85,6 @@ func (h *Handler) createMessage(c *gin.Context) {
 		Role:      "model",
 		CreatedAt: time.Now().UnixMilli(),
 		InReplyTo: message.Id,
-		Text:      buidler.String(),
+		Text:      builder.String(),
 	}))
 }
