@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dro14/yordamchi-api/models"
@@ -58,29 +59,31 @@ func (h *Handler) createMessage(c *gin.Context) {
 	c.Writer.Header().Set("X-Accel-Buffering", "no")
 	c.Writer.Flush()
 
-	response := &models.Message{
-		UserId:    request.UserId,
-		ChatId:    request.ChatId,
-		Role:      "model",
-		CreatedAt: time.Now().UnixMilli(),
-		InReplyTo: request.Contents[len(request.Contents)-1].Id,
-	}
+	message := request.Contents[len(request.Contents)-1]
+	message.Id = time.Now().UnixMilli()
+	sendSSEEvent(c, "request", jsonEncode(message))
 
+	buidler := &strings.Builder{}
 	stream := h.provider.ContentStream(request)
 	for chunk, err := range stream {
 		if err != nil {
 			sendSSEEvent(c, "error", err.Error())
 		} else {
-			if len(response.Text) > 0 {
-				sendSSEEvent(c, "response", jsonEncode(response))
+			if buidler.Len() > 0 {
+				sendSSEEvent(c, "typing", buidler.String())
 			}
 			part := chunk.Candidates[0].Content.Parts[0]
-			response.Text += part.Text
+			buidler.WriteString(part.Text)
 		}
 	}
 
-	response.Id = time.Now().UnixMilli()
-	if len(response.Text) > 0 {
-		sendSSEEvent(c, "response", jsonEncode(response))
-	}
+	sendSSEEvent(c, "response", jsonEncode(&models.Message{
+		Id:        time.Now().UnixMilli(),
+		UserId:    request.UserId,
+		ChatId:    request.ChatId,
+		Role:      "model",
+		CreatedAt: time.Now().UnixMilli(),
+		InReplyTo: message.Id,
+		Text:      buidler.String(),
+	}))
 }
