@@ -70,7 +70,10 @@ func (h *Handler) createMessage(c *gin.Context) {
 			sendSSEEvent(c, "error", err.Error())
 		} else {
 			if builder.Len() > 0 {
-				typing := map[string]string{"text": builder.String()}
+				typing := map[string]any{
+					"in_reply_to": message.Id,
+					"text":        builder.String(),
+				}
 				sendSSEEvent(c, "typing", jsonEncode(typing))
 			}
 			part := chunk.Candidates[0].Content.Parts[0]
