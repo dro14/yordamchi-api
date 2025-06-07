@@ -73,8 +73,11 @@ func (h *Handler) createMessage(c *gin.Context) {
 				typing := map[string]string{"text": builder.String()}
 				sendSSEEvent(c, "typing", jsonEncode(typing))
 			}
-			part := chunk.Candidates[0].Content.Parts[0]
-			builder.WriteString(part.Text)
+			for _, candidate := range chunk.Candidates {
+				for _, part := range candidate.Content.Parts {
+					builder.WriteString(part.Text)
+				}
+			}
 		}
 	}
 
