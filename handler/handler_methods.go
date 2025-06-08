@@ -63,6 +63,8 @@ func (h *Handler) createMessage(c *gin.Context) {
 	message.Id = time.Now().UnixMilli()
 	sendSSEEvent(c, "request", jsonEncode(message))
 
+	skip := 0
+	skipped := 0
 	builder := &strings.Builder{}
 	stream := h.provider.ContentStream(request)
 	for chunk, err := range stream {
@@ -70,8 +72,14 @@ func (h *Handler) createMessage(c *gin.Context) {
 			sendSSEEvent(c, "error", err.Error())
 		} else {
 			if builder.Len() > 0 {
-				typing := map[string]string{"text": builder.String()}
-				sendSSEEvent(c, "typing", jsonEncode(typing))
+				if skipped == skip {
+					chunk := map[string]string{"text": builder.String()}
+					sendSSEEvent(c, "typing", jsonEncode(chunk))
+					skipped = 0
+					skip++
+				} else {
+					skipped++
+				}
 			}
 			for _, candidate := range chunk.Candidates {
 				for _, part := range candidate.Content.Parts {
