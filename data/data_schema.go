@@ -11,6 +11,7 @@ CREATE TABLE chats (
 	id BIGSERIAL PRIMARY KEY,
 	user_id BIGINT NOT NULL,
 	created_at BIGINT NOT NULL,
+	updated_at BIGINT NOT NULL,
 	deleted_at BIGINT
 );
 

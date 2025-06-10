@@ -3,8 +3,6 @@ package handler
 import (
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/dro14/yordamchi-api/utils/e"
 	"github.com/dro14/yordamchi-api/utils/info"
@@ -21,7 +19,14 @@ func (h *Handler) Run(port string) error {
 	authorized := h.engine.Group("")
 	authorized.Use(h.authMiddleware)
 
-	group := authorized.Group("/message")
+	group := authorized.Group("/user")
+	group.POST("", h.createUser)
+
+	group = authorized.Group("/chat")
+	group.POST("", h.createChat)
+	group.DELETE("", h.deleteChat)
+
+	group = authorized.Group("/message")
 	group.POST("", h.createMessage)
 	group.PUT("", h.editMessage)
 
@@ -45,32 +50,16 @@ func (h *Handler) info(c *gin.Context) {
 }
 
 func (h *Handler) authMiddleware(c *gin.Context) {
-	idHeader := c.GetHeader("identifikatsiya")
-	if idHeader == "" {
+	apiKey := c.GetHeader("identifikatsiya")
+	if apiKey == "" {
 		c.JSON(http.StatusUnauthorized, failure(e.ErrNoIdHeader))
 		c.Abort()
 		return
 	}
 
-	authToken, userId, found := strings.Cut(idHeader, "(^)@(^)")
-	if !found {
+	if apiKey != h.apiKey {
 		c.JSON(http.StatusUnauthorized, failure(e.ErrNoIdHeader))
 		c.Abort()
 		return
 	}
-
-	if authToken != h.authToken {
-		c.JSON(http.StatusUnauthorized, failure(e.ErrNoIdHeader))
-		c.Abort()
-		return
-	}
-
-	id, err := strconv.ParseInt(userId, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, failure(e.ErrNoIdHeader))
-		c.Abort()
-		return
-	}
-
-	c.Set("id", id)
 }

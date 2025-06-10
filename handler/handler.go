@@ -10,16 +10,16 @@ import (
 )
 
 type Handler struct {
-	authToken string
-	engine    *gin.Engine
-	data      *data.Data
-	provider  *provider.Provider
+	apiKey   string
+	engine   *gin.Engine
+	data     *data.Data
+	provider *provider.Provider
 }
 
 func New() *Handler {
-	authToken, ok := os.LookupEnv("AUTH_TOKEN")
+	apiKey, ok := os.LookupEnv("API_KEY")
 	if !ok {
-		log.Fatal("auth token is not specified")
+		log.Fatal("api key is not specified")
 	}
 
 	engine := gin.New()
@@ -27,9 +27,9 @@ func New() *Handler {
 	engine.Use(gin.CustomRecovery(notifyOnPanic))
 
 	return &Handler{
-		authToken: authToken,
-		engine:    engine,
-		data:      data.New(),
-		provider:  provider.New(),
+		apiKey:   apiKey,
+		engine:   engine,
+		data:     data.New(),
+		provider: provider.New(),
 	}
 }
