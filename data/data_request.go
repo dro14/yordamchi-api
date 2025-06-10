@@ -25,5 +25,5 @@ func (d *Data) CreateRequest(ctx context.Context, request *models.Request) error
 		nullStructuredOutput.String = request.StructuredOutput
 	}
 	args := []any{request.UserId, request.ChatId, request.StartedAt, request.FinishedAt, request.Latency, request.Chunks, request.Attempts, request.Language, request.SystemInstruction, pq.Array(contents), nullResponse, nullStructuredOutput, pq.Array(request.ToolCalls), request.FinishReason, request.Model, request.PromptTokens, request.ResponseTokens, request.Price}
-	return d.dbExec(ctx, query, args)
+	return d.dbExec(ctx, query, args...)
 }
