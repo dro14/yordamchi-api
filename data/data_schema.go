@@ -43,7 +43,7 @@ CREATE TABLE requests (
 	structured_output TEXT,
 	tool_calls TEXT[],
 	finish_reason VARCHAR(32) NOT NULL,
-	model VARCHAR(32) NOT NULL,
+	model VARCHAR(64) NOT NULL,
 	prompt_tokens BIGINT NOT NULL,
 	response_tokens BIGINT NOT NULL,
 	price DOUBLE PRECISION NOT NULL

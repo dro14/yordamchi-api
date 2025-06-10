@@ -9,6 +9,8 @@ import (
 	"google.golang.org/genai"
 )
 
+const model = "gemini-2.5-flash-preview-05-20"
+
 var systemInstructions = map[string]string{
 	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. ChuqurTech kompaniyasi tomonidan ishlab chiqilgansan. Standart til: O'zbekcha (lotin). Hozirgi vaqt: ",
 	"uz_Cyrl": "Сенинг исминг Yordamchi, матн ва расмларни тушуна оладиган, хушмуомала чатботсан. ChuqurTech компанияси томонидан ишлаб чиқилгансан. Стандарт тил: Ўзбекча (кирил). Ҳозирги вақт: ",
@@ -33,6 +35,7 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 		systemInstruction += "\n\n" + request.SystemInstruction
 	}
 	request.SystemInstruction = systemInstruction
+	request.Model = model
 
 	maxOutputTokens := int32(3072)
 	temperature := new(float32)
@@ -42,7 +45,7 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 
 	return p.client.Models.GenerateContentStream(
 		context.Background(),
-		"gemini-2.5-flash-preview-05-20",
+		model,
 		contents,
 		&genai.GenerateContentConfig{
 			SystemInstruction: genai.Text(request.SystemInstruction)[0],

@@ -103,9 +103,6 @@ Retry:
 			request.PromptTokens = int64(chunk.UsageMetadata.PromptTokenCount)
 			request.ResponseTokens = int64(chunk.UsageMetadata.CandidatesTokenCount)
 		}
-		if chunk.ModelVersion != "" {
-			request.Model = chunk.ModelVersion
-		}
 	}
 
 	response := &models.Message{
