@@ -3,5 +3,6 @@ package e
 import "errors"
 
 var (
-	ErrContentsRequired = errors.New("contents are required")
+	ErrNoIdHeader       = errors.New("yo'qol bu yerdan!")
+	ErrContentsRequired = errors.New("bo'm-bo'shku!")
 )

@@ -27,9 +27,6 @@ func notifyOnPanic(c *gin.Context, err any) {
 }
 
 func jsonEncode(data any) string {
-	json, err := json.Marshal(data)
-	if err != nil {
-		return ""
-	}
+	json, _ := json.Marshal(data)
 	return string(json)
 }
