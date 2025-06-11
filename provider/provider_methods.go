@@ -29,7 +29,8 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 		})
 	}
 
-	systemInstruction := systemInstructions[request.Language] + time.Now().Format(time.DateTime)
+	currentTime := time.Now().Format(time.DateTime)
+	systemInstruction := systemInstructions[request.Language] + currentTime
 
 	if request.SystemInstruction != "" {
 		systemInstruction += "\n\n" + request.SystemInstruction

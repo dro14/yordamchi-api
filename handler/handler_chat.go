@@ -33,14 +33,19 @@ func (h *Handler) createChat(ctx *gin.Context) {
 }
 
 func (h *Handler) deleteChat(ctx *gin.Context) {
-	chat := &models.Chat{}
-	err := ctx.ShouldBindJSON(chat)
+	var request map[string][]int64
+	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, failure(err))
 		return
 	}
-	chat.DeletedAt = f.Now()
-	err = h.data.DeleteChat(ctx, chat)
+
+	if len(request["chat_ids"]) == 0 {
+		ctx.JSON(http.StatusBadRequest, failure(e.ErrEmpty))
+		return
+	}
+
+	err = h.data.DeleteChat(ctx, request["chat_ids"], f.Now())
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return

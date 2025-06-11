@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/dro14/yordamchi-api/models"
+	"github.com/lib/pq"
 )
 
 func (d *Data) CreateChat(ctx context.Context, chat *models.Chat) error {
@@ -24,8 +25,8 @@ func (d *Data) UpdateChat(ctx context.Context, chat *models.Chat) error {
 	return d.dbExec(ctx, query, args...)
 }
 
-func (d *Data) DeleteChat(ctx context.Context, chat *models.Chat) error {
-	query := "UPDATE chats SET deleted_at = $1 WHERE id = $2"
-	args := []any{chat.DeletedAt, chat.Id}
+func (d *Data) DeleteChat(ctx context.Context, chatIds []int64, deletedAt int64) error {
+	query := "UPDATE chats SET deleted_at = $1 WHERE id = ANY($2)"
+	args := []any{deletedAt, pq.Array(chatIds)}
 	return d.dbExec(ctx, query, args...)
 }
