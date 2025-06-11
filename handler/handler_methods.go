@@ -24,7 +24,7 @@ func (h *Handler) Run(port string) error {
 
 	group = authorized.Group("/chat")
 	group.POST("", h.createChat)
-	group.DELETE("", h.deleteChat)
+	group.DELETE("", h.deleteChats)
 
 	group = authorized.Group("/message")
 	group.POST("", h.createMessage)

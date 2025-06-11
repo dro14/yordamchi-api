@@ -62,8 +62,6 @@ func (h *Handler) newRequest(ctx *gin.Context, clear bool) {
 
 Retry:
 	request.Attempts++
-	skip := 0
-	skipped := 0
 	builder := &strings.Builder{}
 	stream := h.provider.ContentStream(request)
 	for chunk, err := range stream {
@@ -77,18 +75,12 @@ Retry:
 		}
 
 		if builder.Len() > 0 {
-			if skipped == skip {
-				chunk := map[string]string{"text": builder.String()}
-				sendSSEEvent(ctx, "chunk", jsonEncode(chunk))
-				if skip == 0 {
-					request.Latency = f.Now() - request.StartedAt
-				}
-				request.Chunks++
-				skipped = 0
-				skip++
-			} else {
-				skipped++
+			chunk := map[string]string{"text": builder.String()}
+			sendSSEEvent(ctx, "chunk", jsonEncode(chunk))
+			if request.Latency == 0 {
+				request.Latency = f.Now() - request.StartedAt
 			}
+			request.Chunks++
 		}
 
 		for _, candidate := range chunk.Candidates {

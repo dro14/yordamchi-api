@@ -32,7 +32,7 @@ func (h *Handler) createChat(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, chat)
 }
 
-func (h *Handler) deleteChat(ctx *gin.Context) {
+func (h *Handler) deleteChats(ctx *gin.Context) {
 	var request map[string][]int64
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
