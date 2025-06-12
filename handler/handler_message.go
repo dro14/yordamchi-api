@@ -12,8 +12,10 @@ import (
 )
 
 const retryAttempts = 10
-const promptTokenPrice = 0.00000015
-const responseTokenPrice = 0.0000006
+const (
+	promptTokenPrice   = 0.00000015
+	responseTokenPrice = 0.00000060
+)
 
 func (h *Handler) createMessage(ctx *gin.Context) {
 	h.newRequest(ctx, false)
@@ -33,7 +35,10 @@ func (h *Handler) newRequest(ctx *gin.Context, delete bool) {
 	}
 	request.StartedAt = startedAt
 
-	if len(request.Contents) == 0 {
+	if request.UserId == 0 ||
+		request.ChatId == 0 ||
+		request.Language == "" ||
+		len(request.Contents) == 0 {
 		ctx.JSON(http.StatusBadRequest, failure(e.ErrEmpty))
 		return
 	}
