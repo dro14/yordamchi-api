@@ -32,18 +32,18 @@ func (h *Handler) Run(port string) error {
 	return h.engine.Run(":" + port)
 }
 
-func (h *Handler) root(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Hello, World!"})
+func (h *Handler) root(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"message": "Hello, World!"})
 }
 
-func (h *Handler) info(c *gin.Context) {
+func (h *Handler) info(ctx *gin.Context) {
 	update := &tgbotapi.Update{}
-	err := c.ShouldBindJSON(update)
+	err := ctx.ShouldBindJSON(update)
 	if err != nil {
 		log.Print("can't bind json: ", err)
-		c.JSON(http.StatusBadRequest, failure(err))
+		ctx.JSON(http.StatusBadRequest, failure(err))
 		return
 	}
 	info.Update(update)
-	c.JSON(http.StatusOK, gin.H{"ok": true})
+	ctx.JSON(http.StatusOK, gin.H{"ok": true})
 }

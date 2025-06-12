@@ -45,7 +45,7 @@ func (h *Handler) deleteChats(ctx *gin.Context) {
 		return
 	}
 
-	err = h.data.DeleteChat(ctx, request["chat_ids"], f.Now())
+	err = h.data.DeleteChats(ctx, request["chat_ids"], f.Now())
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return

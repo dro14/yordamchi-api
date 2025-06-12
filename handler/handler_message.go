@@ -23,7 +23,7 @@ func (h *Handler) editMessage(ctx *gin.Context) {
 	h.newRequest(ctx, true)
 }
 
-func (h *Handler) newRequest(ctx *gin.Context, clear bool) {
+func (h *Handler) newRequest(ctx *gin.Context, delete bool) {
 	startedAt := f.Now()
 	request := &models.Request{}
 	err := ctx.ShouldBindJSON(request)
@@ -46,7 +46,7 @@ func (h *Handler) newRequest(ctx *gin.Context, clear bool) {
 	ctx.Writer.Flush()
 
 	message := request.Contents[len(request.Contents)-1]
-	if clear {
+	if delete {
 		err := h.data.DeleteUntil(ctx, message.ChatId, message.Id)
 		if err != nil {
 			log.Print("can't delete messages: ", err)
