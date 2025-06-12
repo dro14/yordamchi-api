@@ -1,15 +1,15 @@
 package data
 
 import (
-	"context"
 	"database/sql"
 
 	"github.com/dro14/yordamchi-api/models"
 	"github.com/dro14/yordamchi-api/utils/f"
+	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 )
 
-func (d *Data) CreateMessage(ctx context.Context, message *models.Message) error {
+func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
 	query := "INSERT INTO messages (user_id, chat_id, role, created_at, in_reply_to, text, images) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
 	var nullInReplyTo sql.NullInt64
 	var nullText sql.NullString
@@ -33,7 +33,7 @@ func (d *Data) CreateMessage(ctx context.Context, message *models.Message) error
 	return d.dbExec(ctx, query, args...)
 }
 
-func (d *Data) DeleteUntil(ctx context.Context, chatId int64, messageId int64) error {
+func (d *Data) DeleteUntil(ctx *gin.Context, chatId int64, messageId int64) error {
 	query := "UPDATE messages SET deleted_at = $1 WHERE chat_id = $2 AND id >= $3 AND deleted_at IS NULL"
 	args := []any{f.Now(), chatId, messageId}
 	return d.dbExec(ctx, query, args...)

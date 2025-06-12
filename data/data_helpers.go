@@ -1,17 +1,17 @@
 package data
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"log"
 
 	"github.com/dro14/yordamchi-api/utils/e"
+	"github.com/gin-gonic/gin"
 )
 
 const retryAttempts = 5
 
-func (d *Data) dbExec(ctx context.Context, query string, args ...any) error {
+func (d *Data) dbExec(ctx *gin.Context, query string, args ...any) error {
 	var lastErr error
 	for range retryAttempts {
 		_, err := d.db.ExecContext(ctx, query, args...)
@@ -28,7 +28,7 @@ func (d *Data) dbExec(ctx context.Context, query string, args ...any) error {
 	return lastErr
 }
 
-func (d *Data) dbQueryRow(ctx context.Context, query string, args []any, dest ...any) error {
+func (d *Data) dbQueryRow(ctx *gin.Context, query string, args []any, dest ...any) error {
 	var lastErr error
 	for range retryAttempts {
 		err := d.db.QueryRowContext(ctx, query, args...).Scan(dest...)
