@@ -26,7 +26,7 @@ func (h *Handler) createImage(ctx *gin.Context) {
 	}
 	filename := fmt.Sprintf("%d_%x%s", time.Now().UnixMilli(), randomStr, ext)
 
-	err = os.WriteFile("images/"+filename, body, 0644)
+	err = os.WriteFile("rasmlar/"+filename, body, 0644)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return
