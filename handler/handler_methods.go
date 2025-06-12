@@ -30,6 +30,9 @@ func (h *Handler) Run(port string) error {
 	group.POST("", h.createMessage)
 	group.PUT("", h.editMessage)
 
+	group = authorized.Group("/image")
+	group.POST("", h.createImage)
+
 	return h.engine.Run(":" + port)
 }
 
