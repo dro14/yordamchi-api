@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"iter"
+	"os"
 	"time"
 
 	"github.com/dro14/yordamchi-api/models"
@@ -21,11 +22,24 @@ var systemInstructions = map[string]string{
 func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.GenerateContentResponse, error] {
 	var contents []*genai.Content
 	for _, message := range request.Contents {
+		parts := []*genai.Part{}
+		if message.Text != "" {
+			parts = append(parts, &genai.Part{Text: message.Text})
+		}
+		if len(message.Images) > 0 {
+			for _, image := range message.Images {
+				imageData, _ := os.ReadFile("rasmlar/" + image)
+				parts = append(parts, &genai.Part{
+					InlineData: &genai.Blob{
+						MIMEType: "image/jpeg",
+						Data:     imageData,
+					},
+				})
+			}
+		}
 		contents = append(contents, &genai.Content{
-			Parts: []*genai.Part{
-				{Text: message.Text},
-			},
-			Role: message.Role,
+			Parts: parts,
+			Role:  message.Role,
 		})
 	}
 
