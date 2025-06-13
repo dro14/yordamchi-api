@@ -90,7 +90,12 @@ Retry:
 
 		for _, candidate := range chunk.Candidates {
 			for _, part := range candidate.Content.Parts {
-				builder.WriteString(part.Text)
+				if part.Text != "" {
+					builder.WriteString(part.Text)
+				}
+				if part.FunctionCall != nil {
+					sendSSEEvent(ctx, "function_call", jsonEncode(part.FunctionCall))
+				}
 			}
 			if candidate.FinishReason != "" {
 				request.FinishReason = string(candidate.FinishReason)

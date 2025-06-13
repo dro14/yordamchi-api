@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
+	"github.com/dro14/yordamchi-api/utils/f"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,7 +19,7 @@ func (h *Handler) createImage(ctx *gin.Context) {
 
 	randomStr := make([]byte, 8)
 	rand.Read(randomStr)
-	filename := fmt.Sprintf("%d_%x.jpeg", time.Now().UnixMilli(), randomStr)
+	filename := fmt.Sprintf("%d_%x.jpeg", f.Now(), randomStr)
 
 	err = os.WriteFile("rasmlar/"+filename, body, 0644)
 	if err != nil {
