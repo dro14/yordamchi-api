@@ -70,28 +70,34 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 				ThinkingBudget: thinkingBudget,
 			},
 			Tools: []*genai.Tool{{
-				FunctionDeclarations: []*genai.FunctionDeclaration{{
-					Name:        "web_search",
-					Description: "Provides real-time, up-to-date information",
-					Parameters: &genai.Schema{
-						Type: "object",
-						Properties: map[string]*genai.Schema{
-							"query": {
-								Type:        "string",
-								Description: "The query to search for",
+				FunctionDeclarations: []*genai.FunctionDeclaration{
+					{
+						Name:        "web_search",
+						Description: "Provides real-time, up-to-date information",
+						Parameters: &genai.Schema{
+							Type: "object",
+							Properties: map[string]*genai.Schema{
+								"query":         {Type: "string"},
+								"language_code": {Type: "string"},
+								"result_count":  {Type: "integer"},
 							},
-							"language_code": {
-								Type:        "string",
-								Description: "The two-letter code of the query language",
-							},
-							"result_count": {
-								Type:        "integer",
-								Description: "The number of search results to return. The actual number may fluctuate.",
-							},
+							Required: []string{"query", "language_code", "result_count"},
 						},
-						Required: []string{"query", "language_code", "result_count"},
 					},
-				}},
+					{
+						Name:        "image_search",
+						Description: "Finds images relevant to the query",
+						Parameters: &genai.Schema{
+							Type: "object",
+							Properties: map[string]*genai.Schema{
+								"query":         {Type: "string"},
+								"language_code": {Type: "string"},
+								"result_count":  {Type: "integer"},
+							},
+							Required: []string{"query", "language_code", "result_count"},
+						},
+					},
+				},
 			}},
 		},
 	)

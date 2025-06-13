@@ -95,6 +95,11 @@ Retry:
 				}
 				if part.FunctionCall != nil {
 					sendSSEEvent(ctx, "function_call", jsonEncode(part.FunctionCall))
+					if request.Latency == 0 {
+						request.Latency = f.Now() - request.StartedAt
+					}
+					request.Chunks++
+					request.ToolCalls = append(request.ToolCalls, jsonEncode(part.FunctionCall))
 				}
 			}
 			if candidate.FinishReason != "" {
