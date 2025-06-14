@@ -25,9 +25,9 @@ CREATE TABLE messages (
 	in_reply_to BIGINT,
 	text TEXT,
 	images VARCHAR(64)[],
-	function_calls TEXT[],
-	function_responses TEXT[],
-	structured_output TEXT
+	function_calls JSONB,
+	function_responses JSONB,
+	structured_output JSONB
 );
 
 CREATE TABLE requests (

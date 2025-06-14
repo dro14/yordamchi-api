@@ -23,8 +23,10 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 	var contents []*genai.Content
 	for _, message := range request.Contents {
 		parts := []*genai.Part{}
-		if message.Text != "" {
+		isNotEmpty := false
+		if len(message.Text) > 0 {
 			parts = append(parts, &genai.Part{Text: message.Text})
+			isNotEmpty = true
 		}
 		if len(message.Images) > 0 {
 			for _, image := range message.Images {
@@ -36,11 +38,30 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 					},
 				})
 			}
+			isNotEmpty = true
 		}
-		contents = append(contents, &genai.Content{
-			Parts: parts,
-			Role:  message.Role,
-		})
+		if len(message.FunctionCalls) > 0 {
+			for _, functionCall := range message.FunctionCalls {
+				parts = append(parts, &genai.Part{
+					FunctionCall: functionCall,
+				})
+			}
+			isNotEmpty = true
+		}
+		if len(message.FunctionResponses) > 0 {
+			for _, functionResponse := range message.FunctionResponses {
+				parts = append(parts, &genai.Part{
+					FunctionResponse: functionResponse,
+				})
+			}
+			isNotEmpty = true
+		}
+		if isNotEmpty {
+			contents = append(contents, &genai.Content{
+				Parts: parts,
+				Role:  message.Role,
+			})
+		}
 	}
 
 	currentTime := time.Now().Format(time.DateTime)
@@ -70,34 +91,19 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 				ThinkingBudget: thinkingBudget,
 			},
 			Tools: []*genai.Tool{{
-				FunctionDeclarations: []*genai.FunctionDeclaration{
-					{
-						Name:        "web_search",
-						Description: "Provides real-time, up-to-date information",
-						Parameters: &genai.Schema{
-							Type: "object",
-							Properties: map[string]*genai.Schema{
-								"query":         {Type: "string"},
-								"language_code": {Type: "string"},
-								"result_count":  {Type: "integer"},
-							},
-							Required: []string{"query", "language_code", "result_count"},
+				FunctionDeclarations: []*genai.FunctionDeclaration{{
+					Name:        "web_search",
+					Description: "Provides real-time, up-to-date information",
+					Parameters: &genai.Schema{
+						Type: "object",
+						Properties: map[string]*genai.Schema{
+							"query":         {Type: "string"},
+							"language_code": {Type: "string"},
+							"result_count":  {Type: "integer"},
 						},
+						Required: []string{"query", "language_code", "result_count"},
 					},
-					{
-						Name:        "image_search",
-						Description: "Finds images relevant to the query",
-						Parameters: &genai.Schema{
-							Type: "object",
-							Properties: map[string]*genai.Schema{
-								"query":         {Type: "string"},
-								"language_code": {Type: "string"},
-								"result_count":  {Type: "integer"},
-							},
-							Required: []string{"query", "language_code", "result_count"},
-						},
-					},
-				},
+				}},
 			}},
 		},
 	)

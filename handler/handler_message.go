@@ -101,7 +101,7 @@ Retry:
 					response.Text += part.Text
 				}
 				if part.FunctionCall != nil {
-					response.FunctionCalls = append(response.FunctionCalls, jsonEncode(part.FunctionCall))
+					response.FunctionCalls = append(response.FunctionCalls, part.FunctionCall)
 				}
 			}
 			if candidate.FinishReason != "" {

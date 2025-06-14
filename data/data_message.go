@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"encoding/json"
 
 	"github.com/dro14/yordamchi-api/models"
 	"github.com/dro14/yordamchi-api/utils/f"
@@ -17,16 +18,23 @@ func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
 		nullInReplyTo.Int64 = message.InReplyTo
 	}
 	var nullText sql.NullString
-	if message.Text != "" {
+	if len(message.Text) > 0 {
 		nullText.Valid = true
 		nullText.String = message.Text
 	}
-	var nullStructuredOutput sql.NullString
-	if message.StructuredOutput != "" {
-		nullStructuredOutput.Valid = true
-		nullStructuredOutput.String = message.StructuredOutput
+	var functionCalls []byte
+	if len(message.FunctionCalls) > 0 {
+		functionCalls, _ = json.Marshal(message.FunctionCalls)
 	}
-	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), pq.Array(message.FunctionCalls), pq.Array(message.FunctionResponses), nullStructuredOutput}
+	var functionResponses []byte
+	if len(message.FunctionResponses) > 0 {
+		functionResponses, _ = json.Marshal(message.FunctionResponses)
+	}
+	var structuredOutput []byte
+	if len(message.StructuredOutput) > 0 {
+		structuredOutput = []byte(message.StructuredOutput)
+	}
+	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), functionCalls, functionResponses, structuredOutput}
 	var id int64
 	err := d.dbQueryRow(ctx, query, args, &id)
 	if err != nil {
