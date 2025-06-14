@@ -87,7 +87,7 @@ Retry:
 		}
 
 		if len(response.Text) > 0 {
-			chunk := map[string]string{"text": response.Text}
+			chunk := map[string]string{"chunk": response.Text}
 			sendSSEEvent(ctx, "chunk", jsonEncode(chunk))
 			if request.Latency == 0 {
 				request.Latency = f.Now() - request.StartedAt
@@ -101,7 +101,7 @@ Retry:
 					response.Text += part.Text
 				}
 				if part.FunctionCall != nil {
-					response.FunctionCalls = append(response.FunctionCalls, part.FunctionCall)
+					response.Calls = append(response.Calls, part.FunctionCall)
 				}
 			}
 			if candidate.FinishReason != "" {

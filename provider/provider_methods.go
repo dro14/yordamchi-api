@@ -40,16 +40,16 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 			}
 			isNotEmpty = true
 		}
-		if len(message.FunctionCalls) > 0 {
-			for _, functionCall := range message.FunctionCalls {
+		if len(message.Calls) > 0 {
+			for _, functionCall := range message.Calls {
 				parts = append(parts, &genai.Part{
 					FunctionCall: functionCall,
 				})
 			}
 			isNotEmpty = true
 		}
-		if len(message.FunctionResponses) > 0 {
-			for _, functionResponse := range message.FunctionResponses {
+		if len(message.Responses) > 0 {
+			for _, functionResponse := range message.Responses {
 				parts = append(parts, &genai.Part{
 					FunctionResponse: functionResponse,
 				})
