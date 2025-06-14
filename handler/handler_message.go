@@ -122,7 +122,7 @@ Retry:
 	} else {
 		sendSSEEvent(ctx, "response", jsonEncode(response))
 		if request.Latency == 0 {
-			request.Latency = response.CreatedAt - request.StartedAt
+			request.Latency = f.Now() - request.StartedAt
 		}
 		request.Chunks++
 	}

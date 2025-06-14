@@ -24,7 +24,7 @@ CREATE TABLE messages (
 	deleted_at BIGINT,
 	in_reply_to BIGINT,
 	text TEXT,
-	images VARCHAR(255)[],
+	images VARCHAR(64)[],
 	function_calls TEXT[],
 	function_responses TEXT[],
 	structured_output TEXT
