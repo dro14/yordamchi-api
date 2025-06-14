@@ -24,7 +24,10 @@ CREATE TABLE messages (
 	deleted_at BIGINT,
 	in_reply_to BIGINT,
 	text TEXT,
-	images VARCHAR(255)[]
+	images VARCHAR(255)[],
+	function_calls TEXT[],
+	function_responses TEXT[],
+	structured_output TEXT
 );
 
 CREATE TABLE requests (
@@ -39,9 +42,7 @@ CREATE TABLE requests (
 	language VARCHAR(32) NOT NULL,
 	system_instruction TEXT NOT NULL,
 	contents BIGINT[] NOT NULL,
-	response BIGINT,
-	structured_output TEXT,
-	tool_calls TEXT[],
+	response BIGINT NOT NULL,
 	finish_reason VARCHAR(32) NOT NULL,
 	model VARCHAR(64) NOT NULL,
 	prompt_tokens BIGINT NOT NULL,

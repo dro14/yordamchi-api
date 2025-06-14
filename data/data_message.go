@@ -12,16 +12,21 @@ import (
 func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
 	query := "INSERT INTO messages (user_id, chat_id, role, created_at, in_reply_to, text, images) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
 	var nullInReplyTo sql.NullInt64
-	var nullText sql.NullString
 	if message.InReplyTo != 0 {
 		nullInReplyTo.Valid = true
 		nullInReplyTo.Int64 = message.InReplyTo
 	}
+	var nullText sql.NullString
 	if message.Text != "" {
 		nullText.Valid = true
 		nullText.String = message.Text
 	}
-	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images)}
+	var nullStructuredOutput sql.NullString
+	if message.StructuredOutput != "" {
+		nullStructuredOutput.Valid = true
+		nullStructuredOutput.String = message.StructuredOutput
+	}
+	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), pq.Array(message.FunctionCalls), pq.Array(message.FunctionResponses), nullStructuredOutput}
 	var id int64
 	err := d.dbQueryRow(ctx, query, args, &id)
 	if err != nil {

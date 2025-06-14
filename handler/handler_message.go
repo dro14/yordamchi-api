@@ -3,7 +3,6 @@ package handler
 import (
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/dro14/yordamchi-api/models"
 	"github.com/dro14/yordamchi-api/utils/e"
@@ -57,6 +56,7 @@ func (h *Handler) newRequest(ctx *gin.Context, delete bool) {
 			log.Print("can't delete messages: ", err)
 		}
 	}
+
 	message.CreatedAt = f.Now()
 	err = h.data.CreateMessage(ctx, message)
 	if err != nil {
@@ -66,8 +66,15 @@ func (h *Handler) newRequest(ctx *gin.Context, delete bool) {
 	sendSSEEvent(ctx, "request", jsonEncode(message))
 
 Retry:
+
+	response := &models.Message{
+		UserId:    request.UserId,
+		ChatId:    request.ChatId,
+		Role:      "model",
+		InReplyTo: message.Id,
+	}
+
 	request.Attempts++
-	builder := &strings.Builder{}
 	stream := h.provider.ContentStream(request)
 	for chunk, err := range stream {
 		if err != nil {
@@ -79,8 +86,8 @@ Retry:
 			return
 		}
 
-		if builder.Len() > 0 {
-			chunk := map[string]string{"text": builder.String()}
+		if len(response.Text) > 0 {
+			chunk := map[string]string{"text": response.Text}
 			sendSSEEvent(ctx, "chunk", jsonEncode(chunk))
 			if request.Latency == 0 {
 				request.Latency = f.Now() - request.StartedAt
@@ -91,15 +98,10 @@ Retry:
 		for _, candidate := range chunk.Candidates {
 			for _, part := range candidate.Content.Parts {
 				if part.Text != "" {
-					builder.WriteString(part.Text)
+					response.Text += part.Text
 				}
 				if part.FunctionCall != nil {
-					sendSSEEvent(ctx, "function_call", jsonEncode(part.FunctionCall))
-					if request.Latency == 0 {
-						request.Latency = f.Now() - request.StartedAt
-					}
-					request.Chunks++
-					request.ToolCalls = append(request.ToolCalls, jsonEncode(part.FunctionCall))
+					response.FunctionCalls = append(response.FunctionCalls, jsonEncode(part.FunctionCall))
 				}
 			}
 			if candidate.FinishReason != "" {
@@ -112,20 +114,17 @@ Retry:
 		}
 	}
 
-	response := &models.Message{
-		UserId:    request.UserId,
-		ChatId:    request.ChatId,
-		Role:      "model",
-		CreatedAt: f.Now(),
-		InReplyTo: message.Id,
-		Text:      builder.String(),
-	}
+	response.CreatedAt = f.Now()
 	err = h.data.CreateMessage(ctx, response)
 	if err != nil {
 		log.Print("can't create response: ", err)
 		sendSSEEvent(ctx, "error", err.Error())
 	} else {
 		sendSSEEvent(ctx, "response", jsonEncode(response))
+		if request.Latency == 0 {
+			request.Latency = response.CreatedAt - request.StartedAt
+		}
+		request.Chunks++
 	}
 
 	request.Response = response

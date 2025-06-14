@@ -13,8 +13,6 @@ type Request struct {
 	SystemInstruction string     `json:"system_instruction"`
 	Contents          []*Message `json:"contents"`
 	Response          *Message   `json:"response"`
-	StructuredOutput  string     `json:"structured_output"`
-	ToolCalls         []string   `json:"tool_calls"`
 	FinishReason      string     `json:"finish_reason"`
 	Model             string     `json:"model"`
 	PromptTokens      int64      `json:"prompt_tokens"`
