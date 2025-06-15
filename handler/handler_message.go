@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const retryAttempts = 10
+const retryAttempts = 1
 const (
 	promptTokenPrice   = 0.00000015
 	responseTokenPrice = 0.00000060
