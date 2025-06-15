@@ -22,17 +22,20 @@ func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
 		nullText.Valid = true
 		nullText.String = message.Text
 	}
-	var calls []byte
+	var calls sql.Null[[]byte]
 	if len(message.Calls) > 0 {
-		calls, _ = json.Marshal(message.Calls)
+		calls.Valid = true
+		calls.V, _ = json.Marshal(message.Calls)
 	}
-	var responses []byte
+	var responses sql.Null[[]byte]
 	if len(message.Responses) > 0 {
-		responses, _ = json.Marshal(message.Responses)
+		responses.Valid = true
+		responses.V, _ = json.Marshal(message.Responses)
 	}
-	var structuredOutput []byte
+	var structuredOutput sql.Null[[]byte]
 	if len(message.StructuredOutput) > 0 {
-		structuredOutput = []byte(message.StructuredOutput)
+		structuredOutput.Valid = true
+		structuredOutput.V, _ = json.Marshal(message.StructuredOutput)
 	}
 	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), calls, responses, structuredOutput}
 	var id int64

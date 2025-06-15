@@ -60,7 +60,7 @@ func (h *Handler) newRequest(ctx *gin.Context, delete bool) {
 	message.CreatedAt = f.Now()
 	err = h.data.CreateMessage(ctx, message)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, failure(err))
+		sendSSEEvent(ctx, "error", err.Error())
 		return
 	}
 	sendSSEEvent(ctx, "request", jsonEncode(message))
