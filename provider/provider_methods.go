@@ -10,7 +10,7 @@ import (
 	"google.golang.org/genai"
 )
 
-const model = "gemini-2.5-flash"
+const model = "gemini-2.0-flash"
 
 var systemInstructions = map[string]string{
 	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. ChuqurTech kompaniyasi tomonidan ishlab chiqilgansan. Standart til: O'zbekcha (lotin). Hozirgi vaqt: ",
