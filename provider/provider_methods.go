@@ -4,7 +4,6 @@ import (
 	"context"
 	"iter"
 	"os"
-	"time"
 
 	"github.com/dro14/yordamchi-api/models"
 	"google.golang.org/genai"
@@ -13,10 +12,10 @@ import (
 const model = "gemini-2.0-flash"
 
 var systemInstructions = map[string]string{
-	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. ChuqurTech kompaniyasi tomonidan ishlab chiqilgansan. Standart til: O'zbekcha (lotin). Hozirgi vaqt: ",
-	"uz_Cyrl": "Сенинг исминг Yordamchi, матн ва расмларни тушуна оладиган, хушмуомала чатботсан. ChuqurTech компанияси томонидан ишлаб чиқилгансан. Стандарт тил: Ўзбекча (кирил). Ҳозирги вақт: ",
-	"ru":      "Ты являешься дружелюбным чатботом под именем Yordamchi, который понимает текст и изображения. Ты был разработан компанией ChuqurTech. Язык по умолчанию: Русский. Текущее время: ",
-	"en":      "You are a friendly chatbot named Yordamchi, which understands text and images. You were developed by a company called ChuqurTech. Default language: English. Current time: ",
+	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. Standart til: O'zbekcha (lotin)",
+	"uz_Cyrl": "Сенинг исминг Yordamchi, матн ва расмларни тушуна оладиган, хушмуомала чатботсан. Стандарт тил: Ўзбекча (кирил)",
+	"ru":      "Ты являешься дружелюбным чатботом под именем Yordamchi, который понимает текст и изображения. Язык по умолчанию: Русский",
+	"en":      "You are a friendly chatbot named Yordamchi, which understands text and images. Default language: English",
 }
 
 func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.GenerateContentResponse, error] {
@@ -64,9 +63,7 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 		}
 	}
 
-	currentTime := time.Now().Format(time.DateTime)
-	systemInstruction := systemInstructions[request.Language] + currentTime
-
+	systemInstruction := systemInstructions[request.Language]
 	if request.SystemInstruction != "" {
 		systemInstruction += "\n\n" + request.SystemInstruction
 	}

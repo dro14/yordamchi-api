@@ -12,8 +12,8 @@ import (
 
 const retryAttempts = 1
 const (
-	promptTokenPrice   = 0.00000015
-	responseTokenPrice = 0.00000060
+	promptTokenPrice   = 0.00000010
+	responseTokenPrice = 0.00000040
 )
 
 func (h *Handler) createMessage(ctx *gin.Context) {
