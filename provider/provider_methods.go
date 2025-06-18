@@ -9,7 +9,7 @@ import (
 	"google.golang.org/genai"
 )
 
-const model = "gemini-2.0-flash"
+const model = "gemini-2.5-flash"
 
 var systemInstructions = map[string]string{
 	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. Standart til: O'zbekcha (lotin)",
