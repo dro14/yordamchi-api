@@ -90,21 +90,21 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 			ThinkingConfig: &genai.ThinkingConfig{
 				ThinkingBudget: thinkingBudget,
 			},
-			Tools: []*genai.Tool{{
-				FunctionDeclarations: []*genai.FunctionDeclaration{{
-					Name:        "web_search",
-					Description: "Provides real-time, up-to-date information",
-					Parameters: &genai.Schema{
-						Type: "object",
-						Properties: map[string]*genai.Schema{
-							"query":         {Type: "string"},
-							"language_code": {Type: "string"},
-							"result_count":  {Type: "integer"},
-						},
-						Required: []string{"query", "language_code", "result_count"},
-					},
-				}},
-			}},
+			// Tools: []*genai.Tool{{
+			// 	FunctionDeclarations: []*genai.FunctionDeclaration{{
+			// 		Name:        "web_search",
+			// 		Description: "Provides real-time, up-to-date information",
+			// 		Parameters: &genai.Schema{
+			// 			Type: "object",
+			// 			Properties: map[string]*genai.Schema{
+			// 				"query":         {Type: "string"},
+			// 				"language_code": {Type: "string"},
+			// 				"result_count":  {Type: "integer"},
+			// 			},
+			// 			Required: []string{"query", "language_code", "result_count"},
+			// 		},
+			// 	}},
+			// }},
 		},
 	)
 }
