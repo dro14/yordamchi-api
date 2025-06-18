@@ -12,10 +12,10 @@ import (
 const model = "gemini-2.5-flash"
 
 var systemInstructions = map[string]string{
-	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. Standart til: O'zbekcha (lotin)",
-	"uz_Cyrl": "Сенинг исминг Yordamchi, матн ва расмларни тушуна оладиган, хушмуомала чатботсан. Стандарт тил: Ўзбекча (кирил)",
-	"ru":      "Ты являешься дружелюбным чатботом под именем Yordamchi, который понимает текст и изображения. Язык по умолчанию: Русский",
-	"en":      "You are a friendly chatbot named Yordamchi, which understands text and images. Default language: English",
+	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. Javob juda uzun bo'lmasligi kerak. Standart til: O'zbekcha (lotin)",
+	"uz_Cyrl": "Сенинг исминг Yordamchi, матн ва расмларни тушуна оладиган, хушмуомала чатботсан. Жавоб жуда узун бўлмаслиги керак. Стандарт тил: Ўзбекча (кирил)",
+	"ru":      "Ты являешься дружелюбным чатботом под именем Yordamchi, который понимает текст и изображения. Ответ не должен быть слишком длинным. Язык по умолчанию: Русский",
+	"en":      "You are a friendly chatbot named Yordamchi, which understands text and images. Response should not be too long. Default language: English",
 }
 
 func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.GenerateContentResponse, error] {
