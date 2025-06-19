@@ -35,20 +35,20 @@ func (h *Handler) followUp(ctx *gin.Context) {
 	}
 
 	message := &models.Message{
-		UserId:           request.UserId,
-		ChatId:           request.ChatId,
-		Role:             "model",
-		CreatedAt:        f.Now(),
-		StructuredOutput: response.Text(),
+		UserId:    request.UserId,
+		ChatId:    request.ChatId,
+		Role:      "model",
+		CreatedAt: f.Now(),
+		StructuredOutput: jsonEncode(map[string]string{
+			"type":   "follow_up",
+			"result": response.Text(),
+		}),
 	}
 	err = h.data.CreateMessage(ctx, message)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return
 	}
-
-	promptPrice := request.PromptTokens * promptTokenPrice
-	responsePrice := request.ResponseTokens * responseTokenPrice
 
 	request.FinishedAt = f.Now()
 	request.Latency = request.FinishedAt - request.StartedAt
@@ -58,6 +58,10 @@ func (h *Handler) followUp(ctx *gin.Context) {
 	request.FinishReason = string(response.Candidates[0].FinishReason)
 	request.PromptTokens = int64(response.UsageMetadata.PromptTokenCount)
 	request.ResponseTokens = int64(response.UsageMetadata.CandidatesTokenCount)
+
+	promptPrice := request.PromptTokens * promptTokenPrice
+	responsePrice := request.ResponseTokens * responseTokenPrice
+
 	request.Price = float64(promptPrice+responsePrice) / (1e2 * 1e6)
 	err = h.data.CreateRequest(ctx, request)
 	if err != nil {
