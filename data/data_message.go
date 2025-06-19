@@ -11,7 +11,7 @@ import (
 )
 
 func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
-	query := "INSERT INTO messages (user_id, chat_id, role, created_at, in_reply_to, text, images, calls, responses, structured_output) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id"
+	query := "INSERT INTO messages (user_id, chat_id, role, created_at, in_reply_to, text, images, structured_output) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
 	var nullInReplyTo sql.NullInt64
 	if message.InReplyTo != 0 {
 		nullInReplyTo.Valid = true
@@ -22,22 +22,12 @@ func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
 		nullText.Valid = true
 		nullText.String = message.Text
 	}
-	var calls sql.Null[[]byte]
-	if len(message.Calls) > 0 {
-		calls.Valid = true
-		calls.V, _ = json.Marshal(message.Calls)
-	}
-	var responses sql.Null[[]byte]
-	if len(message.Responses) > 0 {
-		responses.Valid = true
-		responses.V, _ = json.Marshal(message.Responses)
-	}
 	var structuredOutput sql.Null[[]byte]
 	if len(message.StructuredOutput) > 0 {
 		structuredOutput.Valid = true
 		structuredOutput.V, _ = json.Marshal(message.StructuredOutput)
 	}
-	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), calls, responses, structuredOutput}
+	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), structuredOutput}
 	var id int64
 	err := d.dbQueryRow(ctx, query, args, &id)
 	if err != nil {

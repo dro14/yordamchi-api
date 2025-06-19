@@ -26,6 +26,9 @@ func (h *Handler) Run(port string) error {
 	group.POST("", h.createMessage)
 	group.PUT("", h.editMessage)
 
+	group = h.engine.Group("/follow-up")
+	group.POST("", h.followUp)
+
 	group = h.engine.Group("/image")
 	group.POST("", h.createImage)
 

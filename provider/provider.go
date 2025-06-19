@@ -8,6 +8,8 @@ import (
 	"google.golang.org/genai"
 )
 
+const model = "gemini-2.5-flash"
+
 type Provider struct {
 	client *genai.Client
 }

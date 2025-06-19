@@ -12,8 +12,8 @@ import (
 
 const retryAttempts = 1
 const (
-	promptTokenPrice   = 0.00000030
-	responseTokenPrice = 0.00000250
+	promptTokenPrice   = 30
+	responseTokenPrice = 250
 )
 
 func (h *Handler) createMessage(ctx *gin.Context) {
@@ -100,9 +100,6 @@ Retry:
 				if part.Text != "" {
 					response.Text += part.Text
 				}
-				if part.FunctionCall != nil {
-					response.Calls = append(response.Calls, part.FunctionCall)
-				}
 			}
 			if candidate.FinishReason != "" {
 				request.FinishReason = string(candidate.FinishReason)
@@ -127,9 +124,12 @@ Retry:
 		request.Chunks++
 	}
 
+	promptPrice := request.PromptTokens * promptTokenPrice
+	responsePrice := request.ResponseTokens * responseTokenPrice
+
 	request.Response = response
 	request.FinishedAt = f.Now()
-	request.Price = float64(request.PromptTokens)*promptTokenPrice + float64(request.ResponseTokens)*responseTokenPrice
+	request.Price = float64(promptPrice+responsePrice) / (1e2 * 1e6)
 	err = h.data.CreateRequest(ctx, request)
 	if err != nil {
 		log.Print("can't create request: ", err)

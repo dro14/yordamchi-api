@@ -9,8 +9,6 @@ import (
 	"google.golang.org/genai"
 )
 
-const model = "gemini-2.5-flash"
-
 var systemInstructions = map[string]string{
 	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. Javob juda uzun bo'lmasligi kerak. Standart til: O'zbekcha (lotin)",
 	"uz_Cyrl": "Сенинг исминг Yordamchi, матн ва расмларни тушуна оладиган, хушмуомала чатботсан. Жавоб жуда узун бўлмаслиги керак. Стандарт тил: Ўзбекча (кирил)",
@@ -35,22 +33,6 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 						MIMEType: "image/jpeg",
 						Data:     imageData,
 					},
-				})
-			}
-			isNotEmpty = true
-		}
-		if len(message.Calls) > 0 {
-			for _, functionCall := range message.Calls {
-				parts = append(parts, &genai.Part{
-					FunctionCall: functionCall,
-				})
-			}
-			isNotEmpty = true
-		}
-		if len(message.Responses) > 0 {
-			for _, functionResponse := range message.Responses {
-				parts = append(parts, &genai.Part{
-					FunctionResponse: functionResponse,
 				})
 			}
 			isNotEmpty = true
@@ -87,21 +69,6 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 			ThinkingConfig: &genai.ThinkingConfig{
 				ThinkingBudget: thinkingBudget,
 			},
-			// Tools: []*genai.Tool{{
-			// 	FunctionDeclarations: []*genai.FunctionDeclaration{{
-			// 		Name:        "web_search",
-			// 		Description: "Provides real-time, up-to-date information",
-			// 		Parameters: &genai.Schema{
-			// 			Type: "object",
-			// 			Properties: map[string]*genai.Schema{
-			// 				"query":         {Type: "string"},
-			// 				"language_code": {Type: "string"},
-			// 				"result_count":  {Type: "integer"},
-			// 			},
-			// 			Required: []string{"query", "language_code", "result_count"},
-			// 		},
-			// 	}},
-			// }},
 		},
 	)
 }
