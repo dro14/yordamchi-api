@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -34,12 +35,19 @@ func (h *Handler) followUp(ctx *gin.Context) {
 		return
 	}
 
+	var followUps []string
+	err = json.Unmarshal([]byte(response.Text()), &followUps)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, failure(err))
+		return
+	}
+
 	message := &models.Message{
-		UserId:           request.UserId,
-		ChatId:           request.ChatId,
-		Role:             "model",
-		CreatedAt:        f.Now(),
-		StructuredOutput: "follow_up:" + response.Text(),
+		UserId:    request.UserId,
+		ChatId:    request.ChatId,
+		Role:      "model",
+		CreatedAt: f.Now(),
+		FollowUps: followUps,
 	}
 	err = h.data.CreateMessage(ctx, message)
 	if err != nil {

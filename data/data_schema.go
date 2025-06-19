@@ -19,13 +19,13 @@ CREATE TABLE messages (
 	id BIGSERIAL PRIMARY KEY,
 	user_id BIGINT NOT NULL,
 	chat_id BIGINT NOT NULL,
-	role VARCHAR(32) NOT NULL,
+	role VARCHAR(255) NOT NULL,
 	created_at BIGINT NOT NULL,
 	deleted_at BIGINT,
 	in_reply_to BIGINT,
 	text TEXT,
-	images VARCHAR(64)[],
-	structured_output JSONB
+	images TEXT[],
+	follow_ups TEXT[]
 );
 
 CREATE TABLE requests (
@@ -37,12 +37,12 @@ CREATE TABLE requests (
 	latency BIGINT NOT NULL,
 	chunks BIGINT NOT NULL,
 	attempts BIGINT NOT NULL,
-	language VARCHAR(32) NOT NULL,
+	language VARCHAR(255) NOT NULL,
 	system_instruction TEXT NOT NULL,
 	contents BIGINT[] NOT NULL,
 	response BIGINT NOT NULL,
-	finish_reason VARCHAR(32) NOT NULL,
-	model VARCHAR(64) NOT NULL,
+	finish_reason VARCHAR(255) NOT NULL,
+	model VARCHAR(255) NOT NULL,
 	prompt_tokens BIGINT NOT NULL,
 	response_tokens BIGINT NOT NULL,
 	price DOUBLE PRECISION NOT NULL

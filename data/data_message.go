@@ -2,7 +2,6 @@ package data
 
 import (
 	"database/sql"
-	"encoding/json"
 
 	"github.com/dro14/yordamchi-api/models"
 	"github.com/dro14/yordamchi-api/utils/f"
@@ -11,7 +10,7 @@ import (
 )
 
 func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
-	query := "INSERT INTO messages (user_id, chat_id, role, created_at, in_reply_to, text, images, structured_output) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
+	query := "INSERT INTO messages (user_id, chat_id, role, created_at, in_reply_to, text, images, follow_ups) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
 	var nullInReplyTo sql.NullInt64
 	if message.InReplyTo != 0 {
 		nullInReplyTo.Valid = true
@@ -22,12 +21,7 @@ func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
 		nullText.Valid = true
 		nullText.String = message.Text
 	}
-	var structuredOutput sql.Null[[]byte]
-	if len(message.StructuredOutput) > 0 {
-		structuredOutput.Valid = true
-		structuredOutput.V, _ = json.Marshal(message.StructuredOutput)
-	}
-	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), structuredOutput}
+	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), pq.Array(message.FollowUps)}
 	var id int64
 	err := d.dbQueryRow(ctx, query, args, &id)
 	if err != nil {
