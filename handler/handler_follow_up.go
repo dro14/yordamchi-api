@@ -41,7 +41,7 @@ func (h *Handler) followUp(ctx *gin.Context) {
 		CreatedAt: f.Now(),
 		StructuredOutput: jsonEncode(map[string]string{
 			"type":   "follow_up",
-			"result": response.Text(),
+			"output": response.Text(),
 		}),
 	}
 	err = h.data.CreateMessage(ctx, message)
