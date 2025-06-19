@@ -35,14 +35,11 @@ func (h *Handler) followUp(ctx *gin.Context) {
 	}
 
 	message := &models.Message{
-		UserId:    request.UserId,
-		ChatId:    request.ChatId,
-		Role:      "model",
-		CreatedAt: f.Now(),
-		StructuredOutput: jsonEncode(map[string]string{
-			"type":   "follow_up",
-			"output": response.Text(),
-		}),
+		UserId:           request.UserId,
+		ChatId:           request.ChatId,
+		Role:             "model",
+		CreatedAt:        f.Now(),
+		StructuredOutput: "follow_up:" + response.Text(),
 	}
 	err = h.data.CreateMessage(ctx, message)
 	if err != nil {
