@@ -33,6 +33,6 @@ func (h *Handler) followUp(ctx *gin.Context) {
 		return
 	}
 
-	ctx.String(http.StatusOK, response)
+	ctx.String(http.StatusOK, response.Text())
 	ctx.Header("Content-Type", "application/json")
 }

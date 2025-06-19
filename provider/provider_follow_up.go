@@ -10,7 +10,7 @@ import (
 
 const followUpInstruction = "Come up with three follow-up questions that the user is likely to ask next. The questions should be in the same language as the user's message."
 
-func (p *Provider) FollowUp(request *models.Request) (string, error) {
+func (p *Provider) FollowUp(request *models.Request) (*genai.GenerateContentResponse, error) {
 	var contents []*genai.Content
 	for _, message := range request.Contents {
 		parts := []*genai.Part{}
@@ -39,11 +39,7 @@ func (p *Provider) FollowUp(request *models.Request) (string, error) {
 		}
 	}
 
-	systemInstruction := systemInstructions[request.Language]
-	if request.SystemInstruction != "" {
-		systemInstruction += "\n\n" + request.SystemInstruction
-	}
-	request.SystemInstruction = systemInstruction
+	request.SystemInstruction = followUpInstruction
 	request.Model = model
 
 	maxOutputTokens := int32(3072)
@@ -52,7 +48,7 @@ func (p *Provider) FollowUp(request *models.Request) (string, error) {
 	thinkingBudget := new(int32)
 	*thinkingBudget = 0
 
-	response, err := p.client.Models.GenerateContent(
+	return p.client.Models.GenerateContent(
 		context.Background(),
 		model,
 		contents,
@@ -72,9 +68,4 @@ func (p *Provider) FollowUp(request *models.Request) (string, error) {
 			},
 		},
 	)
-	if err != nil {
-		return "", err
-	}
-
-	return response.Text(), nil
 }
