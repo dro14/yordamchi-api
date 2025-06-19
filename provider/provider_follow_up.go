@@ -44,7 +44,7 @@ func (p *Provider) FollowUp(request *models.Request) (*genai.GenerateContentResp
 
 	maxOutputTokens := int32(3072)
 	temperature := new(float32)
-	*temperature = 1.0
+	*temperature = 0.5
 	thinkingBudget := new(int32)
 	*thinkingBudget = 0
 
