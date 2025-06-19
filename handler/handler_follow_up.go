@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/dro14/yordamchi-api/models"
@@ -44,6 +45,23 @@ func (h *Handler) followUp(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return
+	}
+
+	promptPrice := request.PromptTokens * promptTokenPrice
+	responsePrice := request.ResponseTokens * responseTokenPrice
+
+	request.FinishedAt = f.Now()
+	request.Latency = request.FinishedAt - request.StartedAt
+	request.Chunks = 1
+	request.Attempts = 1
+	request.Response = message
+	request.FinishReason = string(response.Candidates[0].FinishReason)
+	request.PromptTokens = int64(response.UsageMetadata.PromptTokenCount)
+	request.ResponseTokens = int64(response.UsageMetadata.CandidatesTokenCount)
+	request.Price = float64(promptPrice+responsePrice) / (1e2 * 1e6)
+	err = h.data.CreateRequest(ctx, request)
+	if err != nil {
+		log.Print("can't create request: ", err)
 	}
 
 	ctx.JSON(http.StatusOK, message)
