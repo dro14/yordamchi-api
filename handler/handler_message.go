@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const retryAttempts = 1
+const retryAttempts = 10
 const (
 	promptTokenPrice   = 30
 	responseTokenPrice = 250
@@ -60,6 +60,7 @@ func (h *Handler) newRequest(ctx *gin.Context, delete bool) {
 	message.CreatedAt = f.Now()
 	err = h.data.CreateMessage(ctx, message)
 	if err != nil {
+		log.Print("can't create request: ", err)
 		sendSSEEvent(ctx, "error", err.Error())
 		return
 	}
@@ -79,10 +80,11 @@ Retry:
 	for chunk, err := range stream {
 		if err != nil {
 			log.Print("can't finish stream: ", err)
-			sendSSEEvent(ctx, "error", err.Error())
 			if request.Attempts < retryAttempts {
 				goto Retry
 			}
+			log.Printf("stream failed after %d attempts: %s", request.Attempts, err)
+			sendSSEEvent(ctx, "error", err.Error())
 			return
 		}
 

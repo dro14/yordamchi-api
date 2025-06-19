@@ -29,8 +29,15 @@ func (h *Handler) followUp(ctx *gin.Context) {
 		return
 	}
 
+Retry:
+	request.Attempts++
 	response, err := h.provider.FollowUp(request)
 	if err != nil {
+		log.Print("can't generate follow-ups: ", err)
+		if request.Attempts < retryAttempts {
+			goto Retry
+		}
+		log.Printf("follow-up failed after %d attempts: %s", request.Attempts, err)
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return
 	}
@@ -58,7 +65,6 @@ func (h *Handler) followUp(ctx *gin.Context) {
 	request.FinishedAt = f.Now()
 	request.Latency = request.FinishedAt - request.StartedAt
 	request.Chunks = 1
-	request.Attempts = 1
 	request.Response = message
 	request.FinishReason = string(response.Candidates[0].FinishReason)
 	request.PromptTokens = int64(response.UsageMetadata.PromptTokenCount)
