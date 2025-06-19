@@ -33,6 +33,18 @@ func (h *Handler) followUp(ctx *gin.Context) {
 		return
 	}
 
-	ctx.String(http.StatusOK, response.Text())
-	ctx.Header("Content-Type", "application/json")
+	message := &models.Message{
+		UserId:           request.UserId,
+		ChatId:           request.ChatId,
+		Role:             "model",
+		CreatedAt:        f.Now(),
+		StructuredOutput: response.Text(),
+	}
+	err = h.data.CreateMessage(ctx, message)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, failure(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, message)
 }
