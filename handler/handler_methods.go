@@ -20,6 +20,7 @@ func (h *Handler) Run(port string) error {
 
 	group = h.engine.Group("/chat")
 	group.POST("", h.createChat)
+	group.PATCH("", h.renameChat)
 	group.DELETE("", h.deleteChats)
 
 	group = h.engine.Group("/message")

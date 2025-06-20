@@ -12,7 +12,8 @@ CREATE TABLE chats (
 	user_id BIGINT NOT NULL,
 	created_at BIGINT NOT NULL,
 	updated_at BIGINT NOT NULL,
-	deleted_at BIGINT
+	deleted_at BIGINT,
+	name VARCHAR(255)
 );
 
 CREATE TABLE messages (

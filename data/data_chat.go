@@ -18,6 +18,12 @@ func (d *Data) CreateChat(ctx *gin.Context, chat *models.Chat) error {
 	return nil
 }
 
+func (d *Data) RenameChat(ctx *gin.Context, chat *models.Chat) error {
+	query := "UPDATE chats SET name = $1 WHERE id = $2"
+	args := []any{chat.Name, chat.Id}
+	return d.dbExec(ctx, query, args...)
+}
+
 func (d *Data) DeleteChats(ctx *gin.Context, chatIds []int64, deletedAt int64) error {
 	query := "UPDATE chats SET deleted_at = $1 WHERE id = ANY($2)"
 	args := []any{deletedAt, pq.Array(chatIds)}

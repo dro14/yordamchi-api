@@ -32,6 +32,26 @@ func (h *Handler) createChat(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, chat)
 }
 
+func (h *Handler) renameChat(ctx *gin.Context) {
+	chat := &models.Chat{}
+	err := ctx.ShouldBindJSON(chat)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, failure(err))
+		return
+	}
+
+	if chat.Id == 0 || chat.Name == "" {
+		ctx.JSON(http.StatusBadRequest, failure(e.ErrEmpty))
+		return
+	}
+
+	err = h.data.RenameChat(ctx, chat)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, failure(err))
+		return
+	}
+}
+
 func (h *Handler) deleteChats(ctx *gin.Context) {
 	var request map[string][]int64
 	err := ctx.ShouldBindJSON(&request)
