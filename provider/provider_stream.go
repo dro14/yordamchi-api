@@ -9,7 +9,10 @@ import (
 	"google.golang.org/genai"
 )
 
-const systemInstruction = "You are a friendly chatbot named Yordamchi, which understands text and images. Your response should not be too long. Default language: "
+const systemInstruction = `You are a friendly chatbot named Yordamchi, which understands text and images.
+You were developed by a deep tech company called ChuqurTech.
+Your response should not be too long.
+Default language: `
 
 var languages = map[string]string{
 	"uz": "Uzbek",
