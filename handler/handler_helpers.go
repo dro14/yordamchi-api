@@ -6,8 +6,17 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"github.com/dro14/yordamchi-api/models"
 	"github.com/dro14/yordamchi-api/utils/info"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/genai"
+)
+
+const (
+	retryAttempts       = 10
+	cachedTokenPrice    = 25
+	nonCachedTokenPrice = 100
+	responseTokenPrice  = 400
 )
 
 func failure(err error) gin.H {
@@ -29,4 +38,16 @@ func notifyOnPanic(ctx *gin.Context, err any) {
 func jsonEncode(data any) string {
 	json, _ := json.Marshal(data)
 	return string(json)
+}
+
+func recordUsage(request *models.Request, usageMetadata *genai.GenerateContentResponseUsageMetadata) {
+	request.CachedTokens = int64(usageMetadata.CachedContentTokenCount)
+	request.NonCachedTokens = int64(usageMetadata.PromptTokenCount) - request.CachedTokens
+	request.ToolPromptTokens = int64(usageMetadata.ToolUsePromptTokenCount)
+	request.ThoughtTokens = int64(usageMetadata.ThoughtsTokenCount)
+	request.ResponseTokens = int64(usageMetadata.CandidatesTokenCount) - request.ThoughtTokens
+
+	promptPrice := request.CachedTokens*cachedTokenPrice + request.NonCachedTokens*nonCachedTokenPrice
+	responsePrice := (request.ThoughtTokens + request.ResponseTokens) * responseTokenPrice
+	request.Price = float64(promptPrice+responsePrice) / (1e3 * 1e6)
 }

@@ -15,7 +15,10 @@ type Request struct {
 	Response          *Message   `json:"response"`
 	FinishReason      string     `json:"finish_reason"`
 	Model             string     `json:"model"`
-	PromptTokens      int64      `json:"prompt_tokens"`
+	CachedTokens      int64      `json:"cached_tokens"`
+	NonCachedTokens   int64      `json:"non_cached_tokens"`
+	ToolPromptTokens  int64      `json:"tool_prompt_tokens"`
+	ThoughtTokens     int64      `json:"thought_tokens"`
 	ResponseTokens    int64      `json:"response_tokens"`
 	Price             float64    `json:"price"`
 }

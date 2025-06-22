@@ -45,6 +45,7 @@ Retry:
 	var followUps []string
 	err = json.Unmarshal([]byte(response.Text()), &followUps)
 	if err != nil {
+		log.Printf("can't unmarshal follow-ups: %s\n%s", err, response.Text())
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return
 	}
@@ -58,6 +59,7 @@ Retry:
 	}
 	err = h.data.CreateMessage(ctx, message)
 	if err != nil {
+		log.Print("can't create message: ", err)
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return
 	}
@@ -67,13 +69,7 @@ Retry:
 	request.Chunks = 1
 	request.Response = message
 	request.FinishReason = string(response.Candidates[0].FinishReason)
-	request.PromptTokens = int64(response.UsageMetadata.PromptTokenCount)
-	request.ResponseTokens = int64(response.UsageMetadata.CandidatesTokenCount)
-
-	promptPrice := request.PromptTokens * promptTokenPrice
-	responsePrice := request.ResponseTokens * responseTokenPrice
-
-	request.Price = float64(promptPrice+responsePrice) / (1e2 * 1e6)
+	recordUsage(request, response.UsageMetadata)
 	err = h.data.CreateRequest(ctx, request)
 	if err != nil {
 		log.Print("can't create request: ", err)

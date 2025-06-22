@@ -8,12 +8,7 @@ import (
 	"github.com/dro14/yordamchi-api/utils/e"
 	"github.com/dro14/yordamchi-api/utils/f"
 	"github.com/gin-gonic/gin"
-)
-
-const retryAttempts = 10
-const (
-	promptTokenPrice   = 30
-	responseTokenPrice = 250
+	"google.golang.org/genai"
 )
 
 func (h *Handler) createMessage(ctx *gin.Context) {
@@ -75,6 +70,7 @@ Retry:
 		InReplyTo: message.Id,
 	}
 
+	usageMetadata := &genai.GenerateContentResponseUsageMetadata{}
 	request.Attempts++
 	stream := h.provider.ContentStream(request)
 	for chunk, err := range stream {
@@ -108,8 +104,7 @@ Retry:
 			}
 		}
 		if chunk.UsageMetadata != nil {
-			request.PromptTokens = int64(chunk.UsageMetadata.PromptTokenCount)
-			request.ResponseTokens = int64(chunk.UsageMetadata.CandidatesTokenCount)
+			usageMetadata = chunk.UsageMetadata
 		}
 	}
 
@@ -126,12 +121,9 @@ Retry:
 		request.Chunks++
 	}
 
-	promptPrice := request.PromptTokens * promptTokenPrice
-	responsePrice := request.ResponseTokens * responseTokenPrice
-
 	request.Response = response
 	request.FinishedAt = f.Now()
-	request.Price = float64(promptPrice+responsePrice) / (1e2 * 1e6)
+	recordUsage(request, usageMetadata)
 	err = h.data.CreateRequest(ctx, request)
 	if err != nil {
 		log.Print("can't create request: ", err)

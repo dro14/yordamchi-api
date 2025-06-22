@@ -44,7 +44,10 @@ CREATE TABLE requests (
 	response BIGINT NOT NULL,
 	finish_reason VARCHAR(255) NOT NULL,
 	model VARCHAR(255) NOT NULL,
-	prompt_tokens BIGINT NOT NULL,
+	cached_tokens BIGINT NOT NULL,
+	non_cached_tokens BIGINT NOT NULL,
+	tool_prompt_tokens BIGINT NOT NULL,
+	thought_tokens BIGINT NOT NULL,
 	response_tokens BIGINT NOT NULL,
 	price DOUBLE PRECISION NOT NULL
 );
