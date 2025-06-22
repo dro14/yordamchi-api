@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	retryAttempts       = 10
+	maxErrors           = 10
 	cachedTokenPrice    = 25
 	nonCachedTokenPrice = 100
 	responseTokenPrice  = 400

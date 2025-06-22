@@ -62,24 +62,22 @@ func (h *Handler) newRequest(ctx *gin.Context, delete bool) {
 	sendSSEEvent(ctx, "request", jsonEncode(message))
 
 Retry:
-
 	response := &models.Message{
 		UserId:    request.UserId,
 		ChatId:    request.ChatId,
 		Role:      "model",
 		InReplyTo: message.Id,
 	}
-
 	usageMetadata := &genai.GenerateContentResponseUsageMetadata{}
-	request.Attempts++
 	stream := h.provider.ContentStream(request)
 	for chunk, err := range stream {
 		if err != nil {
+			request.Errors++
 			log.Print("can't finish stream: ", err)
-			if request.Attempts < retryAttempts {
+			if request.Errors < maxErrors {
 				goto Retry
 			}
-			log.Printf("stream failed after %d attempts: %s", request.Attempts, err)
+			log.Printf("stream failed after %d attempts: %s", request.Errors, err)
 			sendSSEEvent(ctx, "error", err.Error())
 			return
 		}

@@ -30,14 +30,14 @@ func (h *Handler) followUp(ctx *gin.Context) {
 	}
 
 Retry:
-	request.Attempts++
 	response, err := h.provider.FollowUp(request)
 	if err != nil {
+		request.Errors++
 		log.Print("can't generate follow-ups: ", err)
-		if request.Attempts < retryAttempts {
+		if request.Errors < maxErrors {
 			goto Retry
 		}
-		log.Printf("follow-up failed after %d attempts: %s", request.Attempts, err)
+		log.Printf("follow-up failed after %d attempts: %s", request.Errors, err)
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return
 	}
@@ -45,7 +45,12 @@ Retry:
 	var followUps []string
 	err = json.Unmarshal([]byte(response.Text()), &followUps)
 	if err != nil {
+		request.Errors++
 		log.Printf("can't unmarshal follow-ups: %s\n%s", err, response.Text())
+		if request.Errors < maxErrors {
+			goto Retry
+		}
+		log.Printf("follow-up failed after %d attempts: %s", request.Errors, err)
 		ctx.JSON(http.StatusInternalServerError, failure(err))
 		return
 	}
@@ -66,7 +71,6 @@ Retry:
 
 	request.FinishedAt = f.Now()
 	request.Latency = request.FinishedAt - request.StartedAt
-	request.Chunks = 1
 	request.Response = message
 	request.FinishReason = string(response.Candidates[0].FinishReason)
 	recordUsage(request, response.UsageMetadata)
