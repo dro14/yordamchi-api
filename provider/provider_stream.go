@@ -9,11 +9,12 @@ import (
 	"google.golang.org/genai"
 )
 
-var systemInstructions = map[string]string{
-	"uz":      "Sening isming Yordamchi, matn va rasmlarni tushuna oladigan, xushmuomala chatbotsan. Javob juda uzun bo'lmasligi kerak. Standart til: O'zbekcha (lotin)",
-	"uz_Cyrl": "Сенинг исминг Yordamchi, матн ва расмларни тушуна оладиган, хушмуомала чатботсан. Жавоб жуда узун бўлмаслиги керак. Стандарт тил: Ўзбекча (кирил)",
-	"ru":      "Ты являешься дружелюбным чатботом под именем Yordamchi, который понимает текст и изображения. Ответ не должен быть слишком длинным. Язык по умолчанию: Русский",
-	"en":      "You are a friendly chatbot named Yordamchi, which understands text and images. Response should not be too long. Default language: English",
+const systemInstruction = "You are a friendly chatbot named Yordamchi, which understands text and images. Your response should not be too long. Default language: "
+
+var languages = map[string]string{
+	"uz": "Uzbek",
+	"ru": "Russian",
+	"en": "English",
 }
 
 func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.GenerateContentResponse, error] {
@@ -45,14 +46,14 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 		}
 	}
 
-	systemInstruction := systemInstructions[request.Language]
+	systemInstruction := systemInstruction + languages[request.Language]
 	if request.SystemInstruction != "" {
 		systemInstruction += "\n\n" + request.SystemInstruction
 	}
 	request.SystemInstruction = systemInstruction
 	request.Model = model
 
-	maxOutputTokens := int32(3072)
+	maxOutputTokens := int32(4096)
 	temperature := new(float32)
 	*temperature = 0.5
 	thinkingBudget := new(int32)
