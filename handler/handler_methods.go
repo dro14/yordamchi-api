@@ -14,6 +14,7 @@ func (h *Handler) Run(port string) error {
 
 	h.engine.GET("", h.root)
 	h.engine.POST("/info", h.info)
+	h.engine.GET("/version", h.version)
 
 	group := h.engine.Group("/user")
 	group.POST("", h.createUser)
@@ -50,4 +51,8 @@ func (h *Handler) info(ctx *gin.Context) {
 	}
 	info.Update(update)
 	ctx.JSON(http.StatusOK, gin.H{"ok": true})
+}
+
+func (h *Handler) version(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"latest": latestVersion, "minimum": minimumVersion})
 }

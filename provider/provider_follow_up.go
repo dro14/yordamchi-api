@@ -15,10 +15,8 @@ func (p *Provider) FollowUp(request *models.Request) (*genai.GenerateContentResp
 	var contents []*genai.Content
 	for _, message := range request.Contents {
 		parts := []*genai.Part{}
-		isNotEmpty := false
 		if len(message.Text) > 0 {
 			parts = append(parts, &genai.Part{Text: message.Text})
-			isNotEmpty = true
 		}
 		if len(message.Images) > 0 {
 			for _, image := range message.Images {
@@ -30,14 +28,11 @@ func (p *Provider) FollowUp(request *models.Request) (*genai.GenerateContentResp
 					},
 				})
 			}
-			isNotEmpty = true
 		}
-		if isNotEmpty {
-			contents = append(contents, &genai.Content{
-				Parts: parts,
-				Role:  message.Role,
-			})
-		}
+		contents = append(contents, &genai.Content{
+			Parts: parts,
+			Role:  message.Role,
+		})
 	}
 
 	request.SystemInstruction = followUpInstruction
