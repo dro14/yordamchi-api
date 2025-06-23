@@ -8,7 +8,8 @@ import (
 	"google.golang.org/genai"
 )
 
-const followUpInstruction = "Come up with three follow-up questions that the user is likely to ask next. The questions should be in the same language as the user's message."
+const followUpInstruction = `Come up with three follow-up questions that the user is likely to ask next.
+The questions should be in the same language as the user's message.`
 
 func (p *Provider) FollowUp(request *models.Request) (*genai.GenerateContentResponse, error) {
 	var contents []*genai.Content
