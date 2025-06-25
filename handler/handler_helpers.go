@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	latestVersion       = "1.0.0"
-	minimumVersion      = "1.0.0"
+	latestVersion       = "1.0.3"
+	minimumVersion      = "1.0.3"
 	maxErrors           = 10
 	cachedTokenPrice    = 25
 	nonCachedTokenPrice = 100
