@@ -9,7 +9,7 @@ import (
 	"google.golang.org/genai"
 )
 
-const systemInstruction = `You are a friendly chatbot named Yordamchi, which understands text and images.
+const systemInstruction = `Your name is Yordamchi and you can understand text and images.
 You were developed by a deep tech company called ChuqurTech.
 Default language: `
 
