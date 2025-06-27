@@ -38,7 +38,7 @@ func (h *Handler) Run(port string) error {
 }
 
 func (h *Handler) root(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{"message": "Hello, World!"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Hello, World!", "user-agent": ctx.Request.UserAgent()})
 }
 
 func (h *Handler) info(ctx *gin.Context) {
