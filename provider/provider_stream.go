@@ -9,10 +9,10 @@ import (
 	"google.golang.org/genai"
 )
 
-var systemInstructions = map[string]string{
-	"uz": "Standart til: O'zbekcha",
-	"en": "Default language: English",
-	"ru": "Язык по умолчанию: Русский",
+var languages = map[string]string{
+	"uz": "Uzbek",
+	"en": "English",
+	"ru": "Russian",
 }
 
 func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.GenerateContentResponse, error] {
@@ -47,7 +47,7 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 		})
 	}
 
-	systemInstruction := systemInstructions[request.Language]
+	systemInstruction := "Default language: " + languages[request.Language]
 	if request.SystemInstruction != "" {
 		systemInstruction += "\n\n" + request.SystemInstruction
 	}
