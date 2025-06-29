@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"encoding/json"
 
 	"github.com/dro14/yordamchi-api/models"
 	"github.com/dro14/yordamchi-api/utils/f"
@@ -10,18 +11,28 @@ import (
 )
 
 func (d *Data) CreateMessage(ctx *gin.Context, message *models.Message) error {
-	query := "INSERT INTO messages (user_id, chat_id, role, created_at, in_reply_to, text, images, follow_ups) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
-	var nullInReplyTo sql.NullInt64
+	query := "INSERT INTO messages (user_id, chat_id, role, created_at, in_reply_to, text, images, follow_ups, calls, responses) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id"
+	var inReplyTo sql.NullInt64
 	if message.InReplyTo != 0 {
-		nullInReplyTo.Valid = true
-		nullInReplyTo.Int64 = message.InReplyTo
+		inReplyTo.Valid = true
+		inReplyTo.Int64 = message.InReplyTo
 	}
-	var nullText sql.NullString
+	var text sql.NullString
 	if len(message.Text) > 0 {
-		nullText.Valid = true
-		nullText.String = message.Text
+		text.Valid = true
+		text.String = message.Text
 	}
-	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, nullInReplyTo, nullText, pq.Array(message.Images), pq.Array(message.FollowUps)}
+	var calls sql.Null[[]byte]
+	if len(message.Calls) > 0 {
+		calls.Valid = true
+		calls.V, _ = json.Marshal(message.Calls)
+	}
+	var responses sql.Null[[]byte]
+	if len(message.Responses) > 0 {
+		responses.Valid = true
+		responses.V, _ = json.Marshal(message.Responses)
+	}
+	args := []any{message.UserId, message.ChatId, message.Role, message.CreatedAt, inReplyTo, text, pq.Array(message.Images), pq.Array(message.FollowUps), calls, responses}
 	var id int64
 	err := d.dbQueryRow(ctx, query, args, &id)
 	if err != nil {

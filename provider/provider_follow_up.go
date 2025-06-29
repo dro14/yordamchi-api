@@ -18,16 +18,24 @@ func (p *Provider) FollowUp(request *models.Request) (*genai.GenerateContentResp
 		if len(message.Text) > 0 {
 			parts = append(parts, &genai.Part{Text: message.Text})
 		}
-		if len(message.Images) > 0 {
-			for _, image := range message.Images {
-				imageData, _ := os.ReadFile("rasmlar/" + image)
-				parts = append(parts, &genai.Part{
-					InlineData: &genai.Blob{
-						MIMEType: "image/jpeg",
-						Data:     imageData,
-					},
-				})
-			}
+		for _, image := range message.Images {
+			imageData, _ := os.ReadFile("rasmlar/" + image)
+			parts = append(parts, &genai.Part{
+				InlineData: &genai.Blob{
+					MIMEType: "image/jpeg",
+					Data:     imageData,
+				},
+			})
+		}
+		for _, call := range message.Calls {
+			parts = append(parts, &genai.Part{
+				FunctionCall: call,
+			})
+		}
+		for _, response := range message.Responses {
+			parts = append(parts, &genai.Part{
+				FunctionResponse: response,
+			})
 		}
 		contents = append(contents, &genai.Content{
 			Parts: parts,

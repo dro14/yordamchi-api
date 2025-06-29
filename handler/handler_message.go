@@ -96,6 +96,9 @@ Retry:
 				if part.Text != "" {
 					response.Text += part.Text
 				}
+				if part.FunctionCall != nil {
+					response.Calls = append(response.Calls, part.FunctionCall)
+				}
 			}
 			if candidate.FinishReason != "" {
 				request.FinishReason = string(candidate.FinishReason)

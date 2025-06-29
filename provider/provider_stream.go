@@ -11,6 +11,7 @@ import (
 
 const systemInstruction = `Your name is Yordamchi and you can understand text and images.
 You were developed by a deep tech company called ChuqurTech.
+Your answer should not be too long.
 Default language: `
 
 var languages = map[string]string{
@@ -23,29 +24,32 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 	var contents []*genai.Content
 	for _, message := range request.Contents {
 		parts := []*genai.Part{}
-		isNotEmpty := false
 		if len(message.Text) > 0 {
 			parts = append(parts, &genai.Part{Text: message.Text})
-			isNotEmpty = true
 		}
-		if len(message.Images) > 0 {
-			for _, image := range message.Images {
-				imageData, _ := os.ReadFile("rasmlar/" + image)
-				parts = append(parts, &genai.Part{
-					InlineData: &genai.Blob{
-						MIMEType: "image/jpeg",
-						Data:     imageData,
-					},
-				})
-			}
-			isNotEmpty = true
-		}
-		if isNotEmpty {
-			contents = append(contents, &genai.Content{
-				Parts: parts,
-				Role:  message.Role,
+		for _, image := range message.Images {
+			imageData, _ := os.ReadFile("rasmlar/" + image)
+			parts = append(parts, &genai.Part{
+				InlineData: &genai.Blob{
+					MIMEType: "image/jpeg",
+					Data:     imageData,
+				},
 			})
 		}
+		for _, call := range message.Calls {
+			parts = append(parts, &genai.Part{
+				FunctionCall: call,
+			})
+		}
+		for _, response := range message.Responses {
+			parts = append(parts, &genai.Part{
+				FunctionResponse: response,
+			})
+		}
+		contents = append(contents, &genai.Content{
+			Parts: parts,
+			Role:  message.Role,
+		})
 	}
 
 	systemInstruction := systemInstruction + languages[request.Language]
@@ -72,6 +76,17 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 			ThinkingConfig: &genai.ThinkingConfig{
 				ThinkingBudget: thinkingBudget,
 			},
+			Tools: []*genai.Tool{{
+				FunctionDeclarations: []*genai.FunctionDeclaration{{
+					Name: "web_search",
+					Parameters: &genai.Schema{
+						Type: "object",
+						Properties: map[string]*genai.Schema{
+							"query": {Type: "string"},
+						},
+					},
+				}},
+			}},
 		},
 	)
 }
