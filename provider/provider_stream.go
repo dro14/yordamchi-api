@@ -9,6 +9,8 @@ import (
 	"google.golang.org/genai"
 )
 
+const systemInstruction = "Your name is Yordamchi. Default language: "
+
 var languages = map[string]string{
 	"uz": "Uzbek",
 	"en": "English",
@@ -47,7 +49,7 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 		})
 	}
 
-	systemInstruction := "Default language: " + languages[request.Language]
+	systemInstruction := systemInstruction + languages[request.Language]
 	if request.SystemInstruction != "" {
 		systemInstruction += "\n\n" + request.SystemInstruction
 	}
