@@ -9,14 +9,10 @@ import (
 	"google.golang.org/genai"
 )
 
-const systemInstruction = `Your name is Yordamchi and you can understand text and images.
-You were developed by a deep tech company called ChuqurTech.
-Default language: `
-
-var languages = map[string]string{
-	"uz": "Uzbek",
-	"ru": "Russian",
-	"en": "English",
+var systemInstructions = map[string]string{
+	"uz": "Standart til: O'zbekcha",
+	"en": "Default language: English",
+	"ru": "Язык по умолчанию: Русский",
 }
 
 func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.GenerateContentResponse, error] {
@@ -51,7 +47,7 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 		})
 	}
 
-	systemInstruction := systemInstruction + languages[request.Language]
+	systemInstruction := systemInstructions[request.Language]
 	if request.SystemInstruction != "" {
 		systemInstruction += "\n\n" + request.SystemInstruction
 	}
