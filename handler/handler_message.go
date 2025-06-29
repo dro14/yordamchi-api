@@ -97,6 +97,9 @@ Retry:
 					response.Text += part.Text
 				}
 				if part.FunctionCall != nil {
+					if part.FunctionCall.Name == "google_search" {
+						part.FunctionCall.Name = "web_search"
+					}
 					response.Calls = append(response.Calls, part.FunctionCall)
 				}
 			}

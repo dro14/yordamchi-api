@@ -75,7 +75,7 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 			},
 			Tools: []*genai.Tool{{
 				FunctionDeclarations: []*genai.FunctionDeclaration{{
-					Name:        "web_search",
+					Name:        "google_search",
 					Description: "Provides real-time, up-to-date information",
 					Parameters: &genai.Schema{
 						Type: "object",
