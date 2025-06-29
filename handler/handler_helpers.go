@@ -16,9 +16,9 @@ const (
 	latestVersion       = "1.0.3"
 	minimumVersion      = "1.0.3"
 	maxErrors           = 10
-	cachedTokenPrice    = 25
-	nonCachedTokenPrice = 100
-	responseTokenPrice  = 400
+	cachedTokenPrice    = 75
+	nonCachedTokenPrice = 300
+	responseTokenPrice  = 2500
 )
 
 func failure(err error) gin.H {
