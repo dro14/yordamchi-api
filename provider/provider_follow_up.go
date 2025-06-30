@@ -46,22 +46,15 @@ func (p *Provider) FollowUp(request *models.Request) (*genai.GenerateContentResp
 	request.SystemInstruction = followUpInstruction
 	request.Model = model
 
-	maxOutputTokens := int32(4096)
-	temperature := new(float32)
-	*temperature = 1.0
-	thinkingBudget := new(int32)
-	*thinkingBudget = 0
-
 	return p.client.Models.GenerateContent(
 		context.Background(),
 		model,
 		contents,
 		&genai.GenerateContentConfig{
-			SystemInstruction: genai.Text(request.SystemInstruction)[0],
-			MaxOutputTokens:   maxOutputTokens,
-			Temperature:       temperature,
+			SystemInstruction: genai.Text(followUpInstruction)[0],
+			MaxOutputTokens:   int32(4096),
 			ThinkingConfig: &genai.ThinkingConfig{
-				ThinkingBudget: thinkingBudget,
+				ThinkingBudget: new(int32),
 			},
 			ResponseMIMEType: "application/json",
 			ResponseSchema: &genai.Schema{

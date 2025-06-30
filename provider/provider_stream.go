@@ -56,22 +56,15 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 	request.SystemInstruction = systemInstruction
 	request.Model = model
 
-	maxOutputTokens := int32(4096)
-	temperature := new(float32)
-	*temperature = 0.5
-	thinkingBudget := new(int32)
-	*thinkingBudget = 0
-
 	return p.client.Models.GenerateContentStream(
 		context.Background(),
 		model,
 		contents,
 		&genai.GenerateContentConfig{
-			SystemInstruction: genai.Text(request.SystemInstruction)[0],
-			MaxOutputTokens:   maxOutputTokens,
-			Temperature:       temperature,
+			SystemInstruction: genai.Text(systemInstruction)[0],
+			MaxOutputTokens:   int32(4096),
 			ThinkingConfig: &genai.ThinkingConfig{
-				ThinkingBudget: thinkingBudget,
+				ThinkingBudget: new(int32),
 			},
 			Tools: []*genai.Tool{{
 				FunctionDeclarations: []*genai.FunctionDeclaration{{
