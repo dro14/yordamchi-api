@@ -66,7 +66,7 @@ Retry:
 		UserId:    request.UserId,
 		ChatId:    request.ChatId,
 		Role:      "model",
-		InReplyTo: message.Id,
+		InReplyTo: inReplyTo(request.Contents),
 	}
 	usageMetadata := &genai.GenerateContentResponseUsageMetadata{}
 	stream := h.provider.ContentStream(request)

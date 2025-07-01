@@ -53,3 +53,12 @@ func recordUsage(request *models.Request, usageMetadata *genai.GenerateContentRe
 	responsePrice := (request.ThoughtTokens + request.ResponseTokens) * responseTokenPrice
 	request.Price = float64(promptPrice+responsePrice) / (1e3 * 1e6)
 }
+
+func inReplyTo(contents []*models.Message) int64 {
+	for i := len(contents) - 1; i >= 0; i-- {
+		if contents[i].Role == "user" && (len(contents[i].Text) > 0 || len(contents[i].Images) > 0) {
+			return contents[i].Id
+		}
+	}
+	return 0
+}
