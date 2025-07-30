@@ -15,15 +15,15 @@ type Provider struct {
 }
 
 func New() *Provider {
-	apiKey, ok := os.LookupEnv("GEMINI_API_KEY")
+	apiKey, ok := os.LookupEnv("GOOGLE_API_KEY")
 	if !ok {
-		log.Fatal("gemini api key is not specified")
+		log.Fatal("google api key is not specified")
 	}
 
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{APIKey: apiKey})
 	if err != nil {
-		log.Fatal("can't create gemini client: ", err)
+		log.Fatal("can't create google client: ", err)
 	}
 
 	return &Provider{
