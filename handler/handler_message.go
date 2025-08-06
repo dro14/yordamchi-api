@@ -92,6 +92,9 @@ Retry:
 		}
 
 		for _, candidate := range chunk.Candidates {
+			if candidate.Content == nil {
+				continue
+			}
 			for _, part := range candidate.Content.Parts {
 				if part.Text != "" {
 					response.Text += part.Text
