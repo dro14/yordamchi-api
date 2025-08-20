@@ -12,7 +12,7 @@ import (
 const model = "gemini-2.5-flash"
 
 type Provider struct {
-	clients []*genai.Client
+	Clients []*genai.Client
 	index   int
 }
 
@@ -34,7 +34,7 @@ func New() *Provider {
 	}
 
 	return &Provider{
-		clients: clients,
+		Clients: clients,
 		index:   0,
 	}
 }

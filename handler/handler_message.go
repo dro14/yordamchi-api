@@ -74,7 +74,7 @@ Retry:
 		if err != nil {
 			request.Errors++
 			log.Print("can't finish stream: ", err)
-			if request.Errors < maxErrors {
+			if request.Errors < int64(len(h.provider.Clients)) {
 				goto Retry
 			}
 			log.Printf("stream failed after %d attempts: %s", request.Errors, err)

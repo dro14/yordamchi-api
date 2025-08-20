@@ -34,7 +34,7 @@ Retry:
 	if err != nil {
 		request.Errors++
 		log.Print("can't generate follow-ups: ", err)
-		if request.Errors < maxErrors {
+		if request.Errors < int64(len(h.provider.Clients)) {
 			goto Retry
 		}
 		log.Printf("follow-up failed after %d attempts: %s", request.Errors, err)
@@ -47,7 +47,7 @@ Retry:
 	if err != nil {
 		request.Errors++
 		log.Printf("can't unmarshal follow-ups: %s\n%s", err, response.Text())
-		if request.Errors < maxErrors {
+		if request.Errors < int64(len(h.provider.Clients)) {
 			goto Retry
 		}
 		log.Printf("follow-up failed after %d attempts: %s", request.Errors, err)
