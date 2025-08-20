@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -11,22 +12,29 @@ import (
 const model = "gemini-2.5-flash"
 
 type Provider struct {
-	client *genai.Client
+	clients []*genai.Client
+	index   int
 }
 
 func New() *Provider {
-	apiKey, ok := os.LookupEnv("GOOGLE_API_KEY")
-	if !ok {
-		log.Fatal("google api key is not specified")
-	}
-
 	ctx := context.Background()
-	client, err := genai.NewClient(ctx, &genai.ClientConfig{APIKey: apiKey})
-	if err != nil {
-		log.Fatal("can't create google client: ", err)
+	var clients []*genai.Client
+	for i := 0; ; i++ {
+		key := fmt.Sprintf("GOOGLE_API_KEY_%d", i)
+		apiKey, ok := os.LookupEnv(key)
+		if !ok {
+			break
+		}
+		client, err := genai.NewClient(ctx, &genai.ClientConfig{APIKey: apiKey})
+		if err != nil {
+			log.Printf("can't create google client: %s", err)
+			continue
+		}
+		clients = append(clients, client)
 	}
 
 	return &Provider{
-		client: client,
+		clients: clients,
+		index:   0,
 	}
 }

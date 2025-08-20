@@ -46,7 +46,8 @@ func (p *Provider) FollowUp(request *models.Request) (*genai.GenerateContentResp
 	request.SystemInstruction = followUpInstruction
 	request.Model = model
 
-	return p.client.Models.GenerateContent(
+	p.index = (p.index + 1) % len(p.clients)
+	return p.clients[p.index].Models.GenerateContent(
 		context.Background(),
 		model,
 		contents,

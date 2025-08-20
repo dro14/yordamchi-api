@@ -56,7 +56,8 @@ func (p *Provider) ContentStream(request *models.Request) iter.Seq2[*genai.Gener
 	request.SystemInstruction = systemInstruction
 	request.Model = model
 
-	return p.client.Models.GenerateContentStream(
+	p.index = (p.index + 1) % len(p.clients)
+	return p.clients[p.index].Models.GenerateContentStream(
 		context.Background(),
 		model,
 		contents,
